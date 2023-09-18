@@ -1,0 +1,47 @@
+Implementar uma BTB de 12288 entradas no total, com 12 vias de conjunto associativo e 1024 conjuntos no total, emulando o processador golden cove da intel. A politica de substituição deverá ser a LRU (least recently used / menos recentemente utilizado), para isso podemos anexar um campo de ciclo_ultimo_acesso a cada entrada para saber qual entrada foi acessada no passado mais distante. 
+
+Lembrando que a cada acesso à BTB (hit ou miss) devemos atualizar o campo de ciclo_ultimo_acesso para receber o ciclo atual, assim podemos simular um LRU perfeito durante remoções de entradas.
+
+Em uma máquina real, cada nova instrução buscada (a cada novo PC/IP) causaria um acesso ao BTB, para tentar prever se a instrução buscada é um salto. Mas no simulador, não precisamos fazer dessa forma, afinal podemos inspecionar a instrução e só fazer o acesso ao BTB para determinar se é um hit ou miss.
+
+No caso de BTB miss prediction ou erro na predição de direção, iremos simular uma penalidade no processador. Ou seja, iremos pausar o estágio de fetch por 12 ciclos (para saltos incondicionais que tiveram BTB Miss) ou 512 ciclos (para saltos condicionais que tenham sido mal previstos). Dessa maneira, segurando a instrução após o branch simularemos os efeitos de latência durante uma falha de predição. Ou seja, a simulação tem o mesmo efeito na máquina real, embora trabalhe de forma diferente. Fique atento para os casos de latencia:
+
+BrIncondicional +
+    BTB-Hit => Zero latência
+    BTB-Miss => 12 ciclos de latência
+
+BrCondicional Taken +
+    BTB-Miss => 512 ciclos de latência
+    BTB-Hit =>
+                  Previsto Taken => Zero latência
+                  Previsto NotTaken => 512 ciclos de latência
+
+BrCondicional NotTaken +
+    BTB-Miss => Zero latência (afinal o processador fará "PC+4")
+    BTB-Hit =>
+                  Previsto Taken => 512 ciclos de latência
+                  Previsto NotTaken => Zero latência
+
+ 
+
+Cada instrução tem diversos campos no ORCS que podemos inspecionar. Note que para determinar se um salto foi tomado ou não, podemos verificar se o PC_p PC da próxima instrução é igual ao PC_a PC atual + tamanho da instrução atual. Ou seja, teremos uma lógica no código para fazer essa verificação. Cuidado para não acabar jogando instruções fora sem querer.
+
+Exemplo:
+
+Considere 3 instruções retornadas em ordem pelo tracer, com os campos: Num_Instrução; Endereço_Instrução; Tamanho_Instrução
+i0 1024 2
+i1 1026 4
+i2 2048 8
+
+Nesse exemplo, podemos ver que entre a i1 e i2 houve um salto tomado, pois para i1 se somarmos Endereço+Tamanho será diferente do Endereço da i2. Ora, sabendo que i1 toma um salto, podemos ver se essa instrução é um salto condicional ou incondicional e assim definir as predições e eventuais penalidades.
+
+ 
+
+Repare ainda que a BTB simulada não precisa necessariamente ter o endereço alvo, afinal estamos simulando o comportamento do processador real, e essa informação não nos trará nenhuma mudança no comportamento simulado.
+
+O preditor de direção base será baseado no 2 bit counter. Ou seja, para cada entrada do BTB, iremos alocar um BHT de 2 bit, para iniciar a predição de direção (baseado no histórico).
+
+Escolher um preditor de saltos dinâmico, proposto no meio acadêmico e comparar contra um preditor base (que será o mesmo para todos alunos).
+
+Recomenda-se verificar lectures de universidades americanas, ou artigos publicados nas seguintes conferencias: ISCA, MICRO, HPCA, ISPASS, SBAC-PAD, Eletronic Letters, etc. A apresentação do trabalho será feita na modalidade de apresentação oral (com slides em formato PDF), para que todos da turma possam assistir, de forma a contribuir na formação de todos. 
+A apresentação será de 20 minutos no máximo, sob pena de penalidade na nota. Cada aluno deverá descrever o mecanismo implementado, de forma sucinta e clara. Sugiro apresentar um exemplo de funcionamento do mecanismo, mostrando o que acontece com cada BRANCH (aprendizado), e como o mecanismo irá prever ENDEREÇO e DIREÇÃO do salto (predição). Na entrega espera-se pelo menos 6 slides mostrando: 3 slides auto-explicativos do mecanismo proposto (Explique para um aluno calouro), 1 slide de parâmetros da simulação e 2 slides de resultados. Os testes devem ser executados com os traços já disponíveis no site do moodle. Espera-se como resultados, tempo final de simulação bem como taxas de acertos e erros na predição de endereços e predição de direção dos saltos. A entrega final do trabalho será feita pelo moodle, onde será entregue o código fonte (zip) e os slides a serem apresentados. O trabalho deverá ser feito pelo aluno, cópia do trabalho (plágio), acarretará em nota igual a Zero para todos os envolvidos.
