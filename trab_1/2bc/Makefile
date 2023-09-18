@@ -17,7 +17,7 @@ SRC_PACKAGE = 		opcode_package.cpp
 
 SRC_TRACE_READER = 	trace_reader.cpp
 
-SRC_PROCESSOR =	 	processor.cpp 
+SRC_PROCESSOR =	 	btb.cpp processor.cpp
 
 SRC_CORE =  simulator.cpp orcs_engine.cpp\
 			$(SRC_TRACE_READER)	\
