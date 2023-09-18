@@ -8,11 +8,13 @@
 #define ASSOCIATIVE_SETS 12
 #define TAG(A) ((A)>>10)
 #define INDEX(A) ((A)&1023)
+#define MAX(A,B) ((A)>(B)?(A):(B))
+#define MIN(A,B) ((A)<(B)?(A):(B))
 
 typedef struct btb_entry_t {
     uint32_t tag;
     bool valid;
-    uint32_t twoBitCounter;
+    int twoBitCounter;
     uint64_t last_access_cycle;
 } btb_entry_t;
 
@@ -36,6 +38,7 @@ class btb_t {
         bool hit(uint64_t pc);
         bool predict(uint64_t pc);
         void update(uint64_t pc,uint64_t cycle,bool taken);
+        void update2BC(uint64_t pc,int set,bool taken);
 };
 
 #endif

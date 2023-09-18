@@ -1,6 +1,18 @@
 #include "btb.hpp"
 
 // =====================================================================
+void btb_t::update2BC(uint64_t pc,int set,bool taken)
+{
+    if(taken)
+    {
+        _table[INDEX(pc)][set].twoBitCounter = MIN(_table[INDEX(pc)][set].twoBitCounter++,3);
+    }
+    else{
+        _table[INDEX(pc)][set].twoBitCounter = MIN(_table[INDEX(pc)][set].twoBitCounter--,0);
+    }
+}
+
+// =====================================================================
 void btb_t::update(uint64_t pc,uint64_t cycle,bool taken)
 {
     /// Check if table contains the passed pc
@@ -12,12 +24,7 @@ void btb_t::update(uint64_t pc,uint64_t cycle,bool taken)
             _table[INDEX(pc)][set].last_access_cycle = cycle;
             _table[INDEX(pc)][set].valid = true;
             _table[INDEX(pc)][set].tag = TAG(pc);
-
-            //TODO: Update 2bc
-            if(taken)
-            {
-                //increase 2bc
-            }
+            update2BC(pc,set,taken);
             return;
         }
 
@@ -39,7 +46,7 @@ void btb_t::update(uint64_t pc,uint64_t cycle,bool taken)
     _table[INDEX(pc)][leastRecentUsed].last_access_cycle = cycle;
     _table[INDEX(pc)][leastRecentUsed].valid = true;
     _table[INDEX(pc)][leastRecentUsed].tag = TAG(pc);
-    //TODO: Update 2bc
+    _table[INDEX(pc)][leastRecentUsed].twoBitCounter = 0;
 }
 
 // =====================================================================
@@ -76,9 +83,13 @@ bool btb_t::hit(uint64_t  pc)
 }
 
 bool btb_t::predict(uint64_t  pc)
-{
-    if(pc != 0)
-        return false;
+{   
+    for(int set = 0; set < ASSOCIATIVE_SETS; set++)
+    {
+        if(_table[INDEX(pc)][set].valid && _table[INDEX(pc)][set].tag == TAG(pc)){
+            return _table[INDEX(pc)][set].twoBitCounter>>1;
+        }
+    }
     return false;
 }
 

@@ -78,7 +78,6 @@ void processor_t::clock() {
 				_latency += 12;
 			}
 		}
-
 	}
 	nextOpcodeAddress = new_instruction.opcode_address + new_instruction.opcode_size;
 	previousOpcodeAddress = new_instruction.opcode_address;
@@ -90,6 +89,7 @@ void processor_t::statistics() {
 	ORCS_PRINTF("######################################################\n");
 	ORCS_PRINTF("processor_t\n");
 
+	ORCS_PRINTF("Total de ciclos: %llu\n",orcs_engine.get_global_cycle());
 	ORCS_PRINTF("BTB Hit: %llu\n",_btb.btb_hit);
 	ORCS_PRINTF("BTB Miss: %llu\n",_btb.btb_miss);
 	ORCS_PRINTF("BTB Wrong prediction: %llu\n",_btb.wrongPrediction);
