@@ -11,6 +11,7 @@ class processor_t {
 
 		int _latency;
 		bool checkBranchPrediction;
+		bool checkConditionalMiss;
 		bool prediction;
 		bool updateBTB;
 		uint64_t nextOpcodeAddress;
