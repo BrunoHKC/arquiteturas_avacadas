@@ -8,7 +8,7 @@ void btb_t::update2BC(uint64_t pc,int set,bool taken)
         _table[INDEX(pc)][set].twoBitCounter = MIN(_table[INDEX(pc)][set].twoBitCounter++,3);
     }
     else{
-        _table[INDEX(pc)][set].twoBitCounter = MIN(_table[INDEX(pc)][set].twoBitCounter--,0);
+        _table[INDEX(pc)][set].twoBitCounter = MAX(_table[INDEX(pc)][set].twoBitCounter--,0);
     }
 }
 

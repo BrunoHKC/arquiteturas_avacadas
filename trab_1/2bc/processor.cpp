@@ -9,6 +9,7 @@ processor_t::processor_t() {
 void processor_t::allocate() {
 
 	_latency = 0;
+	latecy_cycles = 0;
 	checkBranchPrediction = false;
 	checkConditionalMiss = false;
 	updateBTB = false;
@@ -22,6 +23,7 @@ void processor_t::clock() {
 	/// Emulate the latecy cused by branch miss prediction/BTB miss/...
 	if(_latency)
 	{
+		latecy_cycles++;
 		_latency--;
 		return;
 	}
@@ -89,17 +91,15 @@ void processor_t::clock() {
 
 };
 
-
-
-
 // =====================================================================
 void processor_t::statistics() {
 	ORCS_PRINTF("######################################################\n");
-	ORCS_PRINTF("processor_t\n");
+	ORCS_PRINTF("processor_t\n\n");
 
-	ORCS_PRINTF("Total de ciclos: %llu\n",orcs_engine.get_global_cycle());
+	ORCS_PRINTF("Total cycles: %llu\n",orcs_engine.get_global_cycle());
+	ORCS_PRINTF("Total latency: %llu cycles\n\n",latecy_cycles);
 	ORCS_PRINTF("BTB Hit: %llu\n",_btb.btb_hit);
-	ORCS_PRINTF("BTB Miss: %llu\n",_btb.btb_miss);
+	ORCS_PRINTF("BTB Miss: %llu\n\n",_btb.btb_miss);
 	ORCS_PRINTF("Wrong prediction: %llu\n",_btb.wrongPrediction);
 	ORCS_PRINTF("Correct prediction: %llu\n",_btb.correctPrediction);
 
