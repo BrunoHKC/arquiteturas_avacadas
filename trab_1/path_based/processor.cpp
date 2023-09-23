@@ -55,7 +55,6 @@ void processor_t::clock() {
 		checkConditionalMiss = false;
 		bool outcome = new_instruction.opcode_address != nextOpcodeAddress;
 		_latency += outcome?512:0;
-
 	}
 
 
