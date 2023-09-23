@@ -9,9 +9,12 @@ processor_t::processor_t() {
 void processor_t::allocate() {
 
 	_latency = 0;
+	latecy_cycles = 0;
 	checkBranchPrediction = false;
+	checkConditionalMiss = false;
 	updateBTB = false;
 	_btb.allocate();
+	_perceptron.allocate();
 
 };
 
@@ -21,6 +24,7 @@ void processor_t::clock() {
 	/// Emulate the latecy cused by branch miss prediction/BTB miss/...
 	if(_latency)
 	{
+		latecy_cycles++;
 		_latency--;
 		return;
 	}
@@ -35,20 +39,23 @@ void processor_t::clock() {
 	if(updateBTB)
 	{
 		updateBTB = false;
-		bool branchTaken = new_instruction.opcode_address != nextOpcodeAddress;
-		_btb.update(previousOpcodeAddress,orcs_engine.get_global_cycle(),branchTaken);
+		_btb.update(previousOpcodeAddress,orcs_engine.get_global_cycle());
 	}
 
 	if(checkBranchPrediction)
 	{
 		checkBranchPrediction = false;
-		bool branchTaken = new_instruction.opcode_address != nextOpcodeAddress;
-		_btb.updatePredictionStatistics(prediction != branchTaken);
-		if(prediction != branchTaken)
-		{
-			//conditional branch misprediction
-			_latency += 512;
-		}
+		bool outcome = new_instruction.opcode_address != nextOpcodeAddress;
+		_perceptron.update(new_instruction.opcode_address,outcome);
+		_latency += prediction != outcome?512:0;
+	}
+
+	if(checkConditionalMiss)
+	{
+		checkConditionalMiss = false;
+		bool outcome = new_instruction.opcode_address != nextOpcodeAddress;
+		_latency += outcome?512:0;
+
 	}
 
 
@@ -61,13 +68,13 @@ void processor_t::clock() {
 			if(!_btb.hit(new_instruction.opcode_address))
 			{
 				//BTB miss
-				_latency += 512;
+				checkConditionalMiss = true;
 			}
 			else
 			{
 				// branch predict
 				checkBranchPrediction = true;
-				prediction = _btb.predict(new_instruction.opcode_address);
+				prediction = _perceptron.predict(new_instruction.opcode_address);
 			}
 		}
 		else{
@@ -87,12 +94,14 @@ void processor_t::clock() {
 // =====================================================================
 void processor_t::statistics() {
 	ORCS_PRINTF("######################################################\n");
-	ORCS_PRINTF("processor_t\n");
+	ORCS_PRINTF("processor_t\n\n");
 
-	ORCS_PRINTF("Total de ciclos: %llu\n",orcs_engine.get_global_cycle());
+	ORCS_PRINTF("Total cycles: %llu\n",orcs_engine.get_global_cycle());
+	ORCS_PRINTF("Total latency: %llu cycles\n\n",latecy_cycles);
 	ORCS_PRINTF("BTB Hit: %llu\n",_btb.btb_hit);
-	ORCS_PRINTF("BTB Miss: %llu\n",_btb.btb_miss);
-	ORCS_PRINTF("BTB Wrong prediction: %llu\n",_btb.wrongPrediction);
-	ORCS_PRINTF("BTB Correct prediction: %llu\n",_btb.correctPrediction);
+	ORCS_PRINTF("BTB Miss: %llu\n\n",_btb.btb_miss);
+	ORCS_PRINTF("Wrong prediction: %llu\n",_perceptron.wrong_prediction);
+	ORCS_PRINTF("Correct prediction: %llu\n\n",_perceptron.correct_prediction);
+	ORCS_PRINTF("Accuracy: %LF\n\n",(_perceptron.correct_prediction/(long double)(_perceptron.correct_prediction+_perceptron.wrong_prediction)));
 
 };

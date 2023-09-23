@@ -14,7 +14,6 @@
 typedef struct btb_entry_t {
     uint32_t tag;
     bool valid;
-    int twoBitCounter;
     uint64_t last_access_cycle;
 } btb_entry_t;
 
@@ -28,17 +27,12 @@ class btb_t {
         uint64_t btb_hit;
         uint64_t btb_miss;
 
-        uint64_t wrongPrediction;
-        uint64_t correctPrediction;
-		// ====================================================================
+        // ====================================================================
 		/// Methods
 		// ====================================================================
 		void allocate();
-        void updatePredictionStatistics(bool misprediction);
         bool hit(uint64_t pc);
-        bool predict(uint64_t pc);
-        void update(uint64_t pc,uint64_t cycle,bool taken);
-        void update2BC(uint64_t pc,int set,bool taken);
+        void update(uint64_t pc,uint64_t cycle);
 };
 
 #endif

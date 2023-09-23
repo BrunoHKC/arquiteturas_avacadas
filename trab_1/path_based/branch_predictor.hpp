@@ -1,27 +1,28 @@
-#ifndef __BTB_H__
-#define __BTB_H__
+#ifndef __PERCEPTRON_H__
+#define __PERCEPTRON_H__
 #include <inttypes.h>   /* for uint32_t */
 #include <cstdio>
 
 
 #define CONST_N 1024
 #define CONST_H 7
-#define THETA (int)(1.93 CONST_H + 14)
+#define THETA (int)(1.93 * CONST_H + 14)
 #define ABS(X) ((X)>0?(X):(-X))
 
 // ============================================================================
-class perceptron {
+class perceptron_t {
 	private:
-        int weights[CONST_N][CONST_H + 1];
+        int weight[CONST_N][CONST_H + 1];
         
         int speculative_prediction_register[CONST_H + 1];
+        int old_SR[CONST_H+1];
         int outcome_prediction_register[CONST_H + 1];
 
         bool speculative_global_history[CONST_H];
         bool outcome_global_history[CONST_H];
 
         int index_history[CONST_H];
-        int old_SR[CONST_H+1];
+        
 
         int index;
         int y_out;  //Perceptron output
@@ -29,8 +30,10 @@ class perceptron {
         // ====================================================================
 		/// Methods
 		// ====================================================================
-        void shiftRegister(bool* reg);
-        void copy(bool* target,bool* source,int size)
+        void shiftRegister_bool(bool* reg,int size);
+        void shiftRegister_int(int* reg,int size);
+        void copy_bool(bool* target,bool* source,int size);
+        void copy_int(int* target,int* source,int size);
 
     public:
         uint64_t wrong_prediction;
