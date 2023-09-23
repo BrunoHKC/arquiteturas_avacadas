@@ -13,6 +13,8 @@ void processor_t::allocate() {
 	checkBranchPrediction = false;
 	checkConditionalMiss = false;
 	updateBTB = false;
+	predicted_taken = 0;
+	predicted_not_taken = 0;
 	_btb.allocate();
 	_perceptron.allocate();
 
@@ -46,7 +48,7 @@ void processor_t::clock() {
 	{
 		checkBranchPrediction = false;
 		bool outcome = new_instruction.opcode_address != nextOpcodeAddress;
-		_perceptron.update(new_instruction.opcode_address,outcome);
+		_perceptron.update(prediction,outcome);
 		_latency += prediction != outcome?512:0;
 	}
 
@@ -74,6 +76,10 @@ void processor_t::clock() {
 				// branch predict
 				checkBranchPrediction = true;
 				prediction = _perceptron.predict(new_instruction.opcode_address);
+				if(prediction)
+					predicted_taken++;
+				else
+					predicted_not_taken++;
 			}
 		}
 		else{
@@ -101,6 +107,7 @@ void processor_t::statistics() {
 	ORCS_PRINTF("BTB Miss: %llu\n\n",_btb.btb_miss);
 	ORCS_PRINTF("Wrong prediction: %llu\n",_perceptron.wrong_prediction);
 	ORCS_PRINTF("Correct prediction: %llu\n\n",_perceptron.correct_prediction);
+	ORCS_PRINTF("Predicted taken: %llu\n",predicted_taken);
+	ORCS_PRINTF("Predicted not taken: %llu\n\n",predicted_not_taken);
 	ORCS_PRINTF("Accuracy: %LF\n\n",(_perceptron.correct_prediction/(long double)(_perceptron.correct_prediction+_perceptron.wrong_prediction)));
-
 };

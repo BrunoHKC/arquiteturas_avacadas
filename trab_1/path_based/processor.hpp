@@ -16,6 +16,8 @@ class processor_t {
 		bool checkConditionalMiss;
 		bool prediction;
 		bool updateBTB;
+		uint64_t predicted_taken;
+		uint64_t predicted_not_taken;
 		uint64_t nextOpcodeAddress;
 		uint64_t previousOpcodeAddress;
 		btb_t _btb;

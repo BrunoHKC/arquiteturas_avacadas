@@ -4,8 +4,8 @@
 #include <cstdio>
 
 
-#define CONST_N 1024
-#define CONST_H 7
+#define CONST_N 2048
+#define CONST_H 37
 #define THETA (int)(1.93 * CONST_H + 14)
 #define ABS(X) ((X)>0?(X):(-X))
 
@@ -22,6 +22,8 @@ class perceptron_t {
         bool outcome_global_history[CONST_H+1];
 
         int index_history[CONST_H+1];
+        int speculative_index_history[CONST_H+1];
+        int old_speculative_v[CONST_H+1];
         
 
         int index;
@@ -30,8 +32,8 @@ class perceptron_t {
         // ====================================================================
 		/// Methods
 		// ====================================================================
-        void shiftRegister_bool(bool* reg);
-        void shiftRegister_int(int* reg);
+        void shiftRegister_bool(bool* reg,bool value);
+        void shiftRegister_int(int* reg,int value);
         void copy_bool(bool* target,bool* source);
         void copy_int(int* target,int* source);
 
