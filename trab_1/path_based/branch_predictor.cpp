@@ -1,17 +1,17 @@
 #include "branch_predictor.hpp"
 
 
-
+// avoid underflow/overflow
 int satured(int value,bool increment)
 {
     if(increment)
     {
-        if(value < 255)
+        if(value < 255) //weights implemented with int_8
             value++;
     }
     else
     {
-        if(value > -255)
+        if(value > -255) //weights implemented with int_8
             value--;
     }
     return value;
@@ -20,11 +20,11 @@ int satured(int value,bool increment)
 // =====================================================================
 void perceptron_t::shiftRegister_bool(bool* reg,bool value)
 {
-    for(int i = 0; i <= CONST_H;i++)
+    for(int i = 1; i <= CONST_H;i++)
     {
         reg[i] = reg[i-1];
     }
-    reg[1] = value;
+    reg[1] = value; //boolean vectors are addressed by [1..h] indexs
 }
 // =====================================================================
 void perceptron_t::shiftRegister_int(int* reg,int value)
@@ -85,17 +85,15 @@ void perceptron_t::allocate()
 bool perceptron_t::predict(uint64_t pc)
 {
     bool prediction;
-    // hash the pc and save the index history
+    // hash the pc and predict using partial sum + bias
     index = pc % CONST_N;
-    shiftRegister_int(speculative_index_history,index);
-
-    // save the old value of SG and v
-    copy_int(old_speculative_v,speculative_index_history);
-    copy_bool(old_SG,speculative_global_history);
-    
-    // predict
     y_out = speculative_prediction_register[CONST_H] + weight[index][0];
     prediction = y_out >= 0;
+
+    // save the old value of SG and the index
+    shiftRegister_int(index_history,index);
+    copy_bool(old_SG,speculative_global_history);
+    
 
     // speculate next prediction
     for(int j = 1; j <= CONST_H; j++)
@@ -115,9 +113,6 @@ bool perceptron_t::predict(uint64_t pc)
 // =====================================================================
 void perceptron_t::update(bool prediction,bool outcome)
 {
-    //TODO: send pc
-    //index = pc % CONST_N;
-
     //non speculative predictions
     for(int j = 1; j <= CONST_H; j++ )
     {
@@ -138,13 +133,6 @@ void perceptron_t::update(bool prediction,bool outcome)
         copy_int(speculative_prediction_register,outcome_prediction_register);
         copy_bool(speculative_global_history,outcome_global_history);
         copy_int(speculative_index_history,index_history);
-        /*for(int j = 0;j <= CONST_H; j++)
-        {
-            speculative_prediction_register[j] = outcome_prediction_register[j];
-            speculative_global_history[j] = outcome_global_history[j];
-            speculative_index_history[j] = index_history[j];
-        }
-        */
     }
 
     // perceptron learning
