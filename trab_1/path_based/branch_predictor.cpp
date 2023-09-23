@@ -90,8 +90,11 @@ bool perceptron_t::predict(uint64_t pc)
     y_out = speculative_prediction_register[CONST_H] + weight[index][0];
     prediction = y_out >= 0;
 
-    // save the old value of SG and the index
-    shiftRegister_int(index_history,index);
+    // insert the index in the speculative index vector
+    shiftRegister_int(speculative_index_history,index);
+
+    // save old versions of SG and Sv
+    copy_int(old_speculative_index_history,speculative_index_history);
     copy_bool(old_SG,speculative_global_history);
     
 
@@ -113,7 +116,7 @@ bool perceptron_t::predict(uint64_t pc)
 // =====================================================================
 void perceptron_t::update(bool prediction,bool outcome)
 {
-    //non speculative predictions
+    //non speculative values
     for(int j = 1; j <= CONST_H; j++ )
     {
         int k = CONST_H-j;
@@ -125,7 +128,7 @@ void perceptron_t::update(bool prediction,bool outcome)
     outcome_prediction_register[0] = 0;
 
     shiftRegister_bool(outcome_global_history,outcome);
-    //shiftRegister_int(index_history,index);
+    shiftRegister_int(index_history,index);
 
     // perceptron learning
     if(prediction != outcome || ABS(y_out) <= THETA)
@@ -133,9 +136,7 @@ void perceptron_t::update(bool prediction,bool outcome)
         weight[index][0] = satured(weight[index][0],outcome);
         for(int j = 1;j <= CONST_H;j++)
         {
-            //printf("old_v[%d] = %d\n",j,old_speculative_v[j]);
-            int k = old_speculative_v[j];
-            //weight[k][j] = (outcome==old_SG[j])?weight[k][j]+1:weight[k][j]-1;
+            int k = old_speculative_index_history[j-1];
             weight[k][j] = satured(weight[k][j],outcome==old_SG[j]);
         }
     }
@@ -145,6 +146,7 @@ void perceptron_t::update(bool prediction,bool outcome)
     {
         copy_int(speculative_prediction_register,outcome_prediction_register);
         copy_bool(speculative_global_history,outcome_global_history);
+        copy_int(speculative_index_history,index_history);
     }
 
     // update statistics
