@@ -125,33 +125,28 @@ void perceptron_t::update(bool prediction,bool outcome)
     outcome_prediction_register[0] = 0;
 
     shiftRegister_bool(outcome_global_history,outcome);
-    shiftRegister_int(index_history,index);
+    //shiftRegister_int(index_history,index);
+
+    // perceptron learning
+    if(prediction != outcome || ABS(y_out) <= THETA)
+    {
+        weight[index][0] = satured(weight[index][0],outcome);
+        for(int j = 1;j <= CONST_H;j++)
+        {
+            //printf("old_v[%d] = %d\n",j,old_speculative_v[j]);
+            int k = old_speculative_v[j];
+            //weight[k][j] = (outcome==old_SG[j])?weight[k][j]+1:weight[k][j]-1;
+            weight[k][j] = satured(weight[k][j],outcome==old_SG[j]);
+        }
+    }
 
     // handle missprediction
     if(prediction != outcome)
     {
         copy_int(speculative_prediction_register,outcome_prediction_register);
         copy_bool(speculative_global_history,outcome_global_history);
-        copy_int(speculative_index_history,index_history);
     }
 
-    // perceptron learning
-    if(prediction != outcome || ABS(y_out) <= THETA)
-    {
-        /*
-        if(outcome)
-            weight[index][0] = weight[index][0]+1;
-        else
-            weight[index][0] = weight[index][0]-1;
-        */
-        weight[index][0] = satured(weight[index][0],outcome);
-        for(int j = 1;j <= CONST_H;j++)
-        {
-            int k = old_speculative_v[j];
-            //weight[k][j] = (outcome==old_SG[j])?weight[k][j]+1:weight[k][j]-1;
-            weight[k][j] = satured(weight[k][j],outcome==old_SG[j]);
-        }
-    }
     // update statistics
     if(prediction != outcome)
         wrong_prediction++;

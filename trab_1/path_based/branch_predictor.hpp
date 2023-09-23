@@ -22,7 +22,6 @@ class perceptron_t {
         bool outcome_global_history[CONST_H+1];
 
         int index_history[CONST_H+1];
-        int speculative_index_history[CONST_H+1];
         int old_speculative_v[CONST_H+1];
         
 
