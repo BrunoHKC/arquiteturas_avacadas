@@ -12,16 +12,16 @@
 // ============================================================================
 class perceptron_t {
 	private:
-        int weight[CONST_N][CONST_H + 1];
+        int weight[CONST_N][CONST_H+1];
         
-        int speculative_prediction_register[CONST_H + 1];
+        int speculative_prediction_register[CONST_H+1];
         int old_SR[CONST_H+1];
-        int outcome_prediction_register[CONST_H + 1];
+        int outcome_prediction_register[CONST_H+1];
 
-        bool speculative_global_history[CONST_H];
-        bool outcome_global_history[CONST_H];
+        bool speculative_global_history[CONST_H+1];
+        bool outcome_global_history[CONST_H+1];
 
-        int index_history[CONST_H];
+        int index_history[CONST_H+1];
         
 
         int index;
@@ -30,10 +30,10 @@ class perceptron_t {
         // ====================================================================
 		/// Methods
 		// ====================================================================
-        void shiftRegister_bool(bool* reg,int size);
-        void shiftRegister_int(int* reg,int size);
-        void copy_bool(bool* target,bool* source,int size);
-        void copy_int(int* target,int* source,int size);
+        void shiftRegister_bool(bool* reg);
+        void shiftRegister_int(int* reg);
+        void copy_bool(bool* target,bool* source);
+        void copy_int(int* target,int* source);
 
     public:
         uint64_t wrong_prediction;
