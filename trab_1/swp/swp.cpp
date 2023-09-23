@@ -47,12 +47,21 @@ void perceptron_t::allocate()
         }
     }
 
-    //Reset mixed weight matrix
-    for(int i = 0; i < LINES_M;i++)
+    //Reset first mixed weight matrix
+    for(int i = 0; i < LINES_M1;i++)
     {
-        for(int j = 0; j < DEPTH_M;j++)
+        for(int j = 0; j < DEPTH_M1;j++)
         {
-            weight_mixed[i][j] = 0;
+            weight_mixed1[i][j] = 0;
+        }
+    }
+
+    //Reset second mixed weight matrix
+    for(int i = 0; i < LINES_M2;i++)
+    {
+        for(int j = 0; j < DEPTH_M2;j++)
+        {
+            weight_mixed2[i][j] = 0;
         }
     }
 
@@ -77,40 +86,56 @@ uint32_t perceptron_t::hash(uint64_t pc,uint64_t old_pc,uint32_t max_hash_value)
 // =====================================================================
 bool perceptron_t::predict(uint64_t pc)
 {
+    int shift = 0;
     sum = 0;
 
     //most DEPH_S branches using seprated tables
     for(int i = 0; i < DEPTH_S; i++)
     {
-        int index = hash(pc,history_address[i],LINES_S);
-        if(global_history[i])
+        int index = hash(pc,history_address[i + shift],LINES_S);
+        if(global_history[i + shift])
             sum += weight_tkn[index][i];
         else
             sum += weight_ntkn[index][i];
     }
+    shift += DEPTH_S;
 
-    //next DEPH_M branches using mixed tables
-    for(int i = 0; i < DEPTH_M; i++)
+    //next DEPH_M1 branches using mixed tables
+    for(int i = 0; i < DEPTH_M1; i++)
     {
-        int index = hash(pc,history_address[i],LINES_M);
-        if(global_history[i + DEPTH_S])
-            sum += weight_mixed[index][i];
+        int index = hash(pc,history_address[i + shift],LINES_M1);
+        if(global_history[i + shift])
+            sum += weight_mixed1[index][i];
         else
-            sum += weight_mixed[index][i];
+            sum += weight_mixed1[index][i];
     }
+    shift += DEPTH_M1;
+
+    //last DEPH_M2 branches using mixed tables
+    for(int i = 0; i < DEPTH_M2; i++)
+    {
+        int index = hash(pc,history_address[i + shift],LINES_M2);
+        if(global_history[i + shift])
+            sum += weight_mixed2[index][i];
+        else
+            sum += weight_mixed2[index][i];
+    }
+    shift += DEPTH_M1;
 
     return sum >= 0;
 }
 // =====================================================================
 void perceptron_t::update(bool prediction,bool outcome,uint64_t pc)
 {
+    int shift;
     if(ABS(sum) < THRESHOLD || prediction != outcome)
     {
+        shift = 0;
         // update accessed separated tables tkn/ntkn
         for(int i = 0; i < DEPTH_S; i++)
         {
-            int index = hash(pc,history_address[i],LINES_S);
-            if(global_history[i])
+            int index = hash(pc,history_address[i + shift],LINES_S);
+            if(global_history[i + shift])
                 //weight taken used
                 weight_tkn[index][i] = satured(weight_tkn[index][i],outcome);
             
@@ -118,12 +143,21 @@ void perceptron_t::update(bool prediction,bool outcome,uint64_t pc)
                 //weight not taken used
                 weight_ntkn[index][i] = satured(weight_ntkn[index][i],outcome);
         }
+        shift += DEPTH_S;
 
-        //next DEPH_M branches using mixed tables
-        for(int i = 0; i < DEPTH_M; i++)
+        //next DEPH_M1 branches using mixed tables
+        for(int i = 0; i < DEPTH_M1; i++)
         {
-            int index = hash(pc,history_address[i],LINES_M);
-            weight_mixed[index][i] = satured(weight_mixed[index][i],global_history[i + DEPTH_S]);
+            int index = hash(pc,history_address[i + shift],LINES_M1);
+            weight_mixed1[index][i] = satured(weight_mixed1[index][i],outcome);
+        }
+        shift += DEPTH_M1;
+
+        //las DEPH_M2 branches using mixed tables
+        for(int i = 0; i < DEPTH_M2; i++)
+        {
+            int index = hash(pc,history_address[i + shift],LINES_M2);
+            weight_mixed2[index][i] = satured(weight_mixed2[index][i],outcome);
         }
     }
 

@@ -3,13 +3,16 @@
 #include <inttypes.h>   /* for uint32_t */
 #include <cstdio>
 
-#define GH_LEN 128
+#define GH_LEN 65
 
 #define LINES_S 1024
 #define DEPTH_S 20
 
-#define LINES_M 1024
-#define DEPTH_M (GH_LEN - DEPTH_S)
+#define LINES_M1 1024
+#define DEPTH_M1 16
+
+#define LINES_M2 512
+#define DEPTH_M2 (GH_LEN - DEPTH_S - DEPTH_M1)
 
 #define THRESHOLD 107
 
@@ -21,7 +24,8 @@ class perceptron_t {
         int weight_ntkn[LINES_S][DEPTH_S];  //separated weights not taken
         int weight_tkn[LINES_S][DEPTH_S];  //separated weights taken
 
-        int weight_mixed[LINES_M][DEPTH_M];  //mixed weights
+        int weight_mixed1[LINES_M1][DEPTH_M1];  //mixed weights1
+        int weight_mixed2[LINES_M2][DEPTH_M2];  //mixed weights2
         
         bool global_history[GH_LEN];        //global branch outcomes
         uint64_t history_address[GH_LEN];   //last pc address
