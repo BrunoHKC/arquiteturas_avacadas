@@ -107,7 +107,7 @@ bool perceptron_t::predict(uint64_t pc)
         if(global_history[i + shift])
             sum += weight_mixed1[index][i];
         else
-            sum += weight_mixed1[index][i];
+            sum -= weight_mixed1[index][i];
     }
     shift += DEPTH_M1;
 
@@ -118,7 +118,7 @@ bool perceptron_t::predict(uint64_t pc)
         if(global_history[i + shift])
             sum += weight_mixed2[index][i];
         else
-            sum += weight_mixed2[index][i];
+            sum -= weight_mixed2[index][i];
     }
     shift += DEPTH_M1;
 
@@ -149,7 +149,7 @@ void perceptron_t::update(bool prediction,bool outcome,uint64_t pc)
         for(int i = 0; i < DEPTH_M1; i++)
         {
             int index = hash(pc,history_address[i + shift],LINES_M1);
-            weight_mixed1[index][i] = satured(weight_mixed1[index][i],outcome);
+            weight_mixed1[index][i] = satured(weight_mixed1[index][i],outcome == global_history[i + shift]);
         }
         shift += DEPTH_M1;
 
@@ -157,7 +157,7 @@ void perceptron_t::update(bool prediction,bool outcome,uint64_t pc)
         for(int i = 0; i < DEPTH_M2; i++)
         {
             int index = hash(pc,history_address[i + shift],LINES_M2);
-            weight_mixed2[index][i] = satured(weight_mixed2[index][i],outcome);
+            weight_mixed2[index][i] = satured(weight_mixed2[index][i],outcome == global_history[i + shift]);
         }
     }
 
