@@ -15,6 +15,9 @@
 #define DEPTH_M2 (GH_LEN - DEPTH_S - DEPTH_M1)
 
 #define THRESHOLD 107
+#define TC_LOW -64
+#define TC_HIGH 64
+
 
 #define ABS(X) ((X)>0?(X):(-X))
 
@@ -29,6 +32,9 @@ class perceptron_t {
         
         bool global_history[GH_LEN];        //global branch outcomes
         uint64_t history_address[GH_LEN];   //last pc address
+
+        //int threshold_counter;
+        //int theta;
 
         int sum;                            //prediction sum
 
