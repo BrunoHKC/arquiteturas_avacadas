@@ -1,0 +1,115 @@
+Running tests...
+Running: astar
+End of dynamic simulation trace
+End of Simulation
+######################################################
+trace_reader_t
+fetch_instructions:200001517
+######################################################
+processor_t
+
+Total cycles: 3622302706
+Total latency: 3422301188 cycles
+
+BTB Hit: 37208459
+BTB Miss: 512
+
+Wrong prediction: 6684055
+Correct prediction: 24147381
+Accuracy: 0.783206
+
+Running: calculix
+End of dynamic simulation trace
+End of Simulation
+######################################################
+trace_reader_t
+fetch_instructions:200001551
+######################################################
+processor_t
+
+Total cycles: 587264212
+Total latency: 387262660 cycles
+
+BTB Hit: 3926596
+BTB Miss: 253
+
+Wrong prediction: 756279
+Correct prediction: 2805684
+Accuracy: 0.787679
+
+Running: dealII
+End of dynamic simulation trace
+End of Simulation
+######################################################
+trace_reader_t
+fetch_instructions:200001503
+######################################################
+processor_t
+
+Total cycles: 821533372
+Total latency: 621531868 cycles
+
+BTB Hit: 31818986
+BTB Miss: 5148
+
+Wrong prediction: 1212811
+Correct prediction: 20507403
+Accuracy: 0.944162
+
+Running: gromacs
+End of dynamic simulation trace
+End of Simulation
+######################################################
+trace_reader_t
+fetch_instructions:200001492
+######################################################
+processor_t
+
+Total cycles: 456714405
+Total latency: 256712912 cycles
+
+BTB Hit: 5077244
+BTB Miss: 1148
+
+Wrong prediction: 501056
+Correct prediction: 4228701
+Accuracy: 0.894063
+
+Running: libquantum
+End of dynamic simulation trace
+End of Simulation
+######################################################
+trace_reader_t
+fetch_instructions:200001503
+######################################################
+processor_t
+
+Total cycles: 1010749780
+Total latency: 810748276 cycles
+
+BTB Hit: 34952067
+BTB Miss: 58
+
+Wrong prediction: 1583482
+Correct prediction: 33368515
+Accuracy: 0.954696
+
+Running: namd
+End of dynamic simulation trace
+End of Simulation
+######################################################
+trace_reader_t
+fetch_instructions:200001502
+######################################################
+processor_t
+
+Total cycles: 1027088355
+Total latency: 827086852 cycles
+
+BTB Hit: 36627388
+BTB Miss: 1077
+
+Wrong prediction: 1615063
+Correct prediction: 27468367
+Accuracy: 0.944468
+

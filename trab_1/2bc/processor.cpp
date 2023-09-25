@@ -102,5 +102,5 @@ void processor_t::statistics() {
 	ORCS_PRINTF("BTB Miss: %llu\n\n",_btb.btb_miss);
 	ORCS_PRINTF("Wrong prediction: %llu\n",_btb.wrongPrediction);
 	ORCS_PRINTF("Correct prediction: %llu\n",_btb.correctPrediction);
-
+	ORCS_PRINTF("Accuracy: %LF\n\n",(_btb.correctPrediction/(long double)(_btb.correctPrediction+_btb.wrongPrediction)));
 };
